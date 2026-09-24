@@ -92,8 +92,9 @@ export function recommend(
   activities: Activity[],
   checkIn: CheckIn,
   context?: TonightContext | null,
+  skipNames: readonly string[] = [],
 ): ScoredActivity[] {
-  return activities
+  const ranked = activities
     .map((activity) => ({
       activity,
       ...scoreActivity(activity, checkIn, context),
@@ -104,5 +105,6 @@ export function recommend(
         Number(Boolean(b.activity.tonight)) - Number(Boolean(a.activity.tonight)) ||
         a.activity.id - b.activity.id,
     )
-    .slice(0, 3)
+  const unseen = ranked.filter((pick) => !skipNames.includes(pick.activity.name))
+  return (unseen.length > 0 ? unseen : ranked).slice(0, 3)
 }

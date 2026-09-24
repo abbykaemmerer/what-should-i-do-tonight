@@ -33,6 +33,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [eventsMissing, setEventsMissing] = useState(false)
   const [weatherMissing, setWeatherMissing] = useState(false)
+  const [shown, setShown] = useState<string[]>([])
 
   const ready = energy !== null && mood !== null && company !== null && setting !== null
 
@@ -45,7 +46,7 @@ function App() {
       loadContext().catch(() => null),
     ])
     const tonightEvents = tonight ? [...activities, ...tonight.events] : activities
-    setPicks(recommend(tonightEvents, checkIn, tonightContext))
+    setPicks(recommend(tonightEvents, checkIn, tonightContext, shown))
     setContext(tonightContext)
     setEventsMissing(tonight === null)
     setWeatherMissing(tonightContext === null)
@@ -53,7 +54,10 @@ function App() {
     setLoading(false)
   }
 
+  const primary = picks?.[0]
+
   function reset() {
+    if (primary) setShown((names) => [...names, primary.activity.name])
     setPicks(null)
     setContext(null)
     setEventsMissing(false)
@@ -63,7 +67,6 @@ function App() {
 
   const checkIn: CheckIn | null =
     energy && mood && company && setting ? { energy, mood, company, setting } : null
-  const primary = picks?.[0]
   const backups = picks?.slice(1, 3) ?? []
   const moon = primary ? moonNote(primary.activity.setting) : null
 
