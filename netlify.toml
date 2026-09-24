@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# The app asks for /do512/events.json. Locally Vite proxies that.
+# On Netlify this rule does the same job.
+[[redirects]]
+  from = "/do512/*"
+  to = "https://do512.com/:splat"
+  status = 200
+  force = true

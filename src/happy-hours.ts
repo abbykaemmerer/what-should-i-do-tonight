@@ -18,7 +18,7 @@ const happyHours: HappyHour[] = [
     days: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
     start: 15 * 60 + 30,
     end: 18 * 60 + 30,
-    detail: '$1 off drinks on the east side patio',
+    detail: '$1 off appetizers and $1 off drinks, including margaritas, ginger paloma, and Modelo',
   },
   {
     activityId: 7,
@@ -34,7 +34,7 @@ const happyHours: HappyHour[] = [
     days: ['mon', 'tue', 'wed', 'thu'],
     start: 16 * 60,
     end: 18 * 60,
-    detail: '$2 Time Machine lagers',
+    detail: '$2 Time Machine lager, $2 off wine, beer, and frozens, $2 tostadas, and $2 off entrees over $10',
   },
   {
     activityId: 13,
@@ -42,7 +42,7 @@ const happyHours: HappyHour[] = [
     days: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
     start: 15 * 60,
     end: 20 * 60,
-    detail: 'select drink specials',
+    detail: '$5.12 Lone Star and a jello shot',
   },
   {
     activityId: 13,
@@ -50,7 +50,7 @@ const happyHours: HappyHour[] = [
     days: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'],
     start: 15 * 60,
     end: 18 * 60,
-    detail: '$2 off drinks on South Congress',
+    detail: '$2 off beer, wine, and cocktails, and 25% off shared bites',
   },
 ]
 
