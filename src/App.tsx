@@ -1,10 +1,138 @@
+import { useState } from 'react'
 import './App.css'
+import { activities } from './activities.ts'
+import type { Energy, Mood } from './activity.ts'
+import type { CheckIn, CheckInCompany } from './check-in.ts'
+import { explain } from './explain.ts'
+import { recommend, type ScoredActivity } from './score.ts'
+
+const energyOptions: Energy[] = ['low', 'medium', 'high']
+const moodOptions: Mood[] = ['chill', 'social', 'playful', 'adventurous', 'cozy']
+const companyOptions: { value: CheckInCompany; label: string }[] = [
+  { value: 'solo', label: 'Solo' },
+  { value: 'date', label: 'With Eric' },
+  { value: 'friends', label: 'Friends' },
+]
 
 function App() {
+  const [energy, setEnergy] = useState<Energy | null>(null)
+  const [mood, setMood] = useState<Mood | null>(null)
+  const [company, setCompany] = useState<CheckInCompany | null>(null)
+  const [picks, setPicks] = useState<ScoredActivity[] | null>(null)
+  const [showBackups, setShowBackups] = useState(false)
+
+  const ready = energy !== null && mood !== null && company !== null
+
+  function submit() {
+    if (!energy || !mood || !company) return
+    const checkIn: CheckIn = { energy, mood, company }
+    setPicks(recommend(activities, checkIn))
+    setShowBackups(false)
+  }
+
+  function reset() {
+    setPicks(null)
+    setShowBackups(false)
+  }
+
+  const checkIn: CheckIn | null =
+    energy && mood && company ? { energy, mood, company } : null
+  const primary = picks?.[0]
+  const backups = picks?.slice(1, 3) ?? []
+
   return (
     <main className="app">
+      <p className="eyebrow">Tonight</p>
       <h1>What should I do tonight?</h1>
+
+      {primary && checkIn ? (
+        <section className="result">
+          <p className="kicker">Do this</p>
+          <h2>{primary.activity.name}</h2>
+          <p className="description">{primary.activity.description}</p>
+          <p className="why">{explain(checkIn)}</p>
+          {showBackups ? (
+            <div className="backups">
+              <p className="kicker">If not that</p>
+              <ul>
+                {backups.map((pick) => (
+                  <li key={pick.activity.id}>
+                    <h3>{pick.activity.name}</h3>
+                    <p>{pick.activity.description}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <button type="button" className="text-button" onClick={() => setShowBackups(true)}>
+              I'm not feeling that
+            </button>
+          )}
+          <button type="button" className="text-button" onClick={reset}>
+            Start over
+          </button>
+        </section>
+      ) : (
+        <form
+          className="check-in"
+          onSubmit={(event) => {
+            event.preventDefault()
+            submit()
+          }}
+        >
+          <ChoiceGroup legend="Energy" options={energyOptions} value={energy} onChange={setEnergy} />
+          <ChoiceGroup legend="Mood" options={moodOptions} value={mood} onChange={setMood} />
+          <fieldset className="choices">
+            <legend>Who's with you</legend>
+            <div className="options">
+              {companyOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={company === option.value}
+                  onClick={() => setCompany(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <button type="submit" className="submit" disabled={!ready}>
+            Tell me
+          </button>
+        </form>
+      )}
     </main>
+  )
+}
+
+function ChoiceGroup<T extends string>({
+  legend,
+  options,
+  value,
+  onChange,
+}: {
+  legend: string
+  options: T[]
+  value: T | null
+  onChange: (value: T) => void
+}) {
+  return (
+    <fieldset className="choices">
+      <legend>{legend}</legend>
+      <div className="options">
+        {options.map((option) => (
+          <button
+            key={option}
+            type="button"
+            aria-pressed={value === option}
+            onClick={() => onChange(option)}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+    </fieldset>
   )
 }
 
