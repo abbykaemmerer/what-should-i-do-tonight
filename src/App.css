@@ -107,7 +107,8 @@ button {
   line-height: 1.45;
 }
 
-.why {
+.why,
+.addon {
   font-family: ui-sans-serif, system-ui, sans-serif;
   font-size: 0.95rem;
 }

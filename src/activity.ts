@@ -24,4 +24,5 @@ export type Activity = {
   cost: Cost
   needsDaylight: boolean
   weather: Weather[]
+  tonight?: boolean
 }

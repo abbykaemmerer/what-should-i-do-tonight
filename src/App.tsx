@@ -4,6 +4,7 @@ import { activities } from './activities.ts'
 import type { Energy, Mood } from './activity.ts'
 import type { CheckIn, CheckInCompany } from './check-in.ts'
 import { explain } from './explain.ts'
+import { loadTonight, takesDrinkAddOn, type DrinkSpecial } from './events.ts'
 import { recommend, type ScoredActivity } from './score.ts'
 
 const energyOptions: Energy[] = ['low', 'medium', 'high']
@@ -19,19 +20,34 @@ function App() {
   const [mood, setMood] = useState<Mood | null>(null)
   const [company, setCompany] = useState<CheckInCompany | null>(null)
   const [picks, setPicks] = useState<ScoredActivity[] | null>(null)
+  const [drinkSpecial, setDrinkSpecial] = useState<DrinkSpecial | null>(null)
   const [showBackups, setShowBackups] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const ready = energy !== null && mood !== null && company !== null
 
-  function submit() {
-    if (!energy || !mood || !company) return
+  async function submit() {
+    if (!energy || !mood || !company || loading) return
     const checkIn: CheckIn = { energy, mood, company }
-    setPicks(recommend(activities, checkIn))
+    setLoading(true)
+    let tonightEvents = activities
+    let special: DrinkSpecial | null = null
+    try {
+      const tonight = await loadTonight()
+      tonightEvents = [...activities, ...tonight.events]
+      special = tonight.drinkSpecial
+    } catch {
+      tonightEvents = activities
+    }
+    setPicks(recommend(tonightEvents, checkIn))
+    setDrinkSpecial(special)
     setShowBackups(false)
+    setLoading(false)
   }
 
   function reset() {
     setPicks(null)
+    setDrinkSpecial(null)
     setShowBackups(false)
   }
 
@@ -39,6 +55,9 @@ function App() {
     energy && mood && company ? { energy, mood, company } : null
   const primary = picks?.[0]
   const backups = picks?.slice(1, 3) ?? []
+  const visible = showBackups ? (picks ?? []) : primary ? [primary] : []
+  const showDrink =
+    drinkSpecial !== null && visible.some((pick) => takesDrinkAddOn(pick.activity.id))
 
   return (
     <main className="app">
@@ -51,6 +70,12 @@ function App() {
           <h2>{primary.activity.name}</h2>
           <p className="description">{primary.activity.description}</p>
           <p className="why">{explain(checkIn)}</p>
+          {showDrink && drinkSpecial ? (
+            <p className="addon">
+              While you're out: {drinkSpecial.title} at {drinkSpecial.venue}
+              {drinkSpecial.detail ? ` — ${drinkSpecial.detail}` : ''}.
+            </p>
+          ) : null}
           {showBackups ? (
             <div className="backups">
               <p className="kicker">If not that</p>
@@ -97,8 +122,8 @@ function App() {
               ))}
             </div>
           </fieldset>
-          <button type="submit" className="submit" disabled={!ready}>
-            Tell me
+          <button type="submit" className="submit" disabled={!ready || loading}>
+            {loading ? 'Checking tonight…' : 'Tell me'}
           </button>
         </form>
       )}

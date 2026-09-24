@@ -42,8 +42,8 @@ export type ScoredActivity = {
   score: number
 }
 
-// Highest score first. Equal scores keep the earlier activity id so the
-// order does not change between runs.
+// Highest score first. A tonight event beats a tied local activity, then
+// the earlier id wins so the order stays stable.
 export function recommend(
   activities: Activity[],
   checkIn: CheckIn,
@@ -53,6 +53,11 @@ export function recommend(
       activity,
       score: scoreActivity(activity, checkIn),
     }))
-    .sort((a, b) => b.score - a.score || a.activity.id - b.activity.id)
+    .sort(
+      (a, b) =>
+        b.score - a.score ||
+        Number(Boolean(b.activity.tonight)) - Number(Boolean(a.activity.tonight)) ||
+        a.activity.id - b.activity.id,
+    )
     .slice(0, 3)
 }

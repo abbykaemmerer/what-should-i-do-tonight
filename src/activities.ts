@@ -19,7 +19,7 @@ export const activities: Activity[] = [
     name: 'Run',
     description: 'Get out and run while it still feels good outside.',
     energy: 'high',
-    moods: ['adventurous'],
+    moods: [],
     company: 'solo',
     setting: 'outdoor',
     movement: 'active',
