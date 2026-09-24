@@ -1,7 +1,11 @@
 import './App.css'
 
 function App() {
-  return <h1>What should I do tonight?</h1>
+  return (
+    <main className="app">
+      <h1>What should I do tonight?</h1>
+    </main>
+  )
 }
 
 export default App
