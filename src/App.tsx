@@ -26,6 +26,8 @@ function App() {
   const [context, setContext] = useState<TonightContext | null>(null)
   const [showBackups, setShowBackups] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [eventsMissing, setEventsMissing] = useState(false)
+  const [weatherMissing, setWeatherMissing] = useState(false)
 
   const ready = energy !== null && mood !== null && company !== null
 
@@ -41,6 +43,8 @@ function App() {
     setPicks(recommend(tonightEvents, checkIn, tonightContext))
     setDrinkSpecial(tonight?.drinkSpecial ?? null)
     setContext(tonightContext)
+    setEventsMissing(tonight === null)
+    setWeatherMissing(tonightContext === null)
     setShowBackups(false)
     setLoading(false)
   }
@@ -49,6 +53,8 @@ function App() {
     setPicks(null)
     setDrinkSpecial(null)
     setContext(null)
+    setEventsMissing(false)
+    setWeatherMissing(false)
     setShowBackups(false)
   }
 
@@ -61,7 +67,7 @@ function App() {
     drinkSpecial !== null && visible.some((pick) => takesDrinkAddOn(pick.activity.id))
 
   return (
-    <main className="app">
+    <main className={primary && checkIn ? 'app result-page' : 'app'}>
       <p className="eyebrow">Tonight</p>
       <h1>What should I do tonight?</h1>
 
@@ -71,10 +77,15 @@ function App() {
           <h2>{primary.activity.name}</h2>
           <p className="description">{descriptionFor(primary.activity)}</p>
           <p className="why">{explain(checkIn, primary.factors, context)}</p>
+          {eventsMissing ? (
+            <p className="notice">Tonight's shows didn't load. This is from the local list.</p>
+          ) : null}
+          {weatherMissing ? (
+            <p className="notice">Weather didn't load, so this ignores the sky.</p>
+          ) : null}
           {showDrink && drinkSpecial ? (
             <p className="addon">
-              While you're out: {drinkSpecial.title} at {drinkSpecial.venue}
-              {drinkSpecial.detail ? ` — ${drinkSpecial.detail}` : ''}.
+              {`While you're out: ${drinkSpecial.title} at ${drinkSpecial.venue}${drinkSpecial.detail ? ` — ${drinkSpecial.detail.trim()}` : ''}.`}
             </p>
           ) : null}
           {showBackups ? (
