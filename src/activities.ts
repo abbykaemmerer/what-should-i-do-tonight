@@ -4,7 +4,7 @@ export const activities: Activity[] = [
   {
     id: 1,
     name: 'Walk',
-    description: 'A neighborhood walk with no plan attached.',
+    description: 'A neighborhood walk, walk the trail, go the Greenbelt, anywhere you want to go.',
     energy: 'medium',
     moods: ['chill'],
     company: 'any',
@@ -30,7 +30,7 @@ export const activities: Activity[] = [
   {
     id: 3,
     name: 'Pilates',
-    description: 'A class that uses the energy without wrecking the night.',
+    description: 'Go to Todds and chill or hit solidcore and sweat your ass off.',
     energy: 'medium',
     moods: ['chill'],
     company: 'solo',
@@ -43,7 +43,7 @@ export const activities: Activity[] = [
   {
     id: 4,
     name: 'Pool',
-    description: 'Swim, then stay in the water longer than you meant to.',
+    description: 'Take your book and read in the water.',
     energy: 'medium',
     moods: ['playful'],
     company: 'any',
@@ -69,7 +69,7 @@ export const activities: Activity[] = [
   {
     id: 6,
     name: 'Deep Eddy',
-    description: 'An easier pool day, close by, with room to float.',
+    description: 'Dip in the pool and then grab a burger and beer at Pool Burger.',
     energy: 'medium',
     moods: ['chill', 'playful'],
     company: 'any',
@@ -82,7 +82,7 @@ export const activities: Activity[] = [
   {
     id: 7,
     name: 'Patio hang',
-    description: 'Sit outside with a drink and let the evening move slowly.',
+    description: 'Sit outside with a drink and watch the sky change colors.',
     energy: 'low',
     moods: ['social', 'chill'],
     company: 'any',
@@ -95,7 +95,7 @@ export const activities: Activity[] = [
   {
     id: 8,
     name: 'Trivia',
-    description: 'A team, a table, and something to pay attention to.',
+    description: 'General or specialized, find some trivia tonight and be silly with your friends.',
     energy: 'medium',
     moods: ['social', 'playful'],
     company: 'friends',
@@ -108,7 +108,7 @@ export const activities: Activity[] = [
   {
     id: 9,
     name: 'Live music',
-    description: 'Go hear someone play instead of staying in.',
+    description: 'You live in Austin, go listen to some live music.',
     energy: 'medium',
     moods: ['social', 'adventurous'],
     company: 'friends',
@@ -121,7 +121,7 @@ export const activities: Activity[] = [
   {
     id: 10,
     name: 'Hang out with friends',
-    description: 'Be with people, without turning it into an event.',
+    description: 'Invite some friends over for a movie night, game night, or just to hang out.',
     energy: 'low',
     moods: ['social', 'cozy'],
     company: 'friends',
@@ -134,7 +134,7 @@ export const activities: Activity[] = [
   {
     id: 11,
     name: "Grill on Eric's roof",
-    description: 'Cook upstairs and stay out while the city cools off.',
+    description: 'Grill out while sun sets and have dessert in the pool.',
     energy: 'medium',
     moods: ['social', 'cozy'],
     company: 'date',
@@ -147,7 +147,7 @@ export const activities: Activity[] = [
   {
     id: 12,
     name: 'Date night',
-    description: 'Get dressed up a little and go somewhere together.',
+    description: 'Get gussied up and go somewhere flirty.',
     energy: 'medium',
     moods: ['social', 'cozy'],
     company: 'date',
@@ -160,7 +160,7 @@ export const activities: Activity[] = [
   {
     id: 13,
     name: 'Sunset drinks and a walk',
-    description: 'Catch the sunset, then walk somewhere for a drink.',
+    description: 'Catch the sunset then walk somewhere for a drink.',
     energy: 'medium',
     moods: ['chill', 'playful'],
     company: 'date',
@@ -186,7 +186,7 @@ export const activities: Activity[] = [
   {
     id: 15,
     name: 'Reading',
-    description: 'Stay in with a book and let the night stay quiet.',
+    description: 'Stay in with a book and let the night stay quiet. Bonus points for a fire or patio lounge.',
     energy: 'low',
     moods: ['chill', 'cozy'],
     company: 'solo',
@@ -199,7 +199,7 @@ export const activities: Activity[] = [
   {
     id: 16,
     name: 'Craft night',
-    description: 'Make something small at home with your hands busy.',
+    description: 'Make something small at home with your hands busy. Invite someone to join if you want company.',
     energy: 'low',
     moods: ['cozy', 'playful'],
     company: 'any',
@@ -212,7 +212,7 @@ export const activities: Activity[] = [
   {
     id: 17,
     name: 'Early bedtime',
-    description: 'Call it and actually go to sleep.',
+    description: 'Seems like you could use some rest dog, go to sleep early.',
     energy: 'low',
     moods: ['cozy', 'chill'],
     company: 'solo',
