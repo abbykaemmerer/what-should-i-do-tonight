@@ -1,5 +1,6 @@
 import type { Activity, Energy } from './activity.ts'
 import type { CheckIn } from './check-in.ts'
+import type { TonightContext } from './context.ts'
 
 const energyLevels: Energy[] = ['low', 'medium', 'high']
 
@@ -8,12 +9,31 @@ const energyLevels: Energy[] = ['low', 'medium', 'high']
 const exactMatchPoints = 2
 const nearEnergyPoints = 1
 
-export function scoreActivity(activity: Activity, checkIn: CheckIn): number {
-  return (
-    energyPoints(activity.energy, checkIn.energy) +
-    moodPoints(activity, checkIn) +
-    companyPoints(activity, checkIn)
-  )
+export type Factors = {
+  energy: number
+  mood: number
+  company: number
+  weather: number
+  daylight: number
+}
+
+export function scoreActivity(
+  activity: Activity,
+  checkIn: CheckIn,
+  context?: TonightContext | null,
+): { score: number; factors: Factors } {
+  const factors = {
+    energy: energyPoints(activity.energy, checkIn.energy),
+    mood: moodPoints(activity, checkIn),
+    company: companyPoints(activity, checkIn),
+    weather: context ? weatherPoints(activity, context) : 0,
+    daylight: context ? daylightPoints(activity, context) : 0,
+  }
+
+  return {
+    score: factors.energy + factors.mood + factors.company + factors.weather + factors.daylight,
+    factors,
+  }
 }
 
 function energyPoints(activityEnergy: Energy, checkInEnergy: Energy): number {
@@ -37,9 +57,24 @@ function companyPoints(activity: Activity, checkIn: CheckIn): number {
   return matches ? exactMatchPoints : 0
 }
 
+function weatherPoints(activity: Activity, context: TonightContext): number {
+  return context.conditions.reduce((total, condition) => {
+    if (activity.weather.includes(condition)) return total + exactMatchPoints
+    const harsh = condition === 'rain' || condition === 'hot' || condition === 'cold'
+    if (harsh && activity.setting === 'outdoor') return total - exactMatchPoints
+    return total
+  }, 0)
+}
+
+function daylightPoints(activity: Activity, context: TonightContext): number {
+  if (!activity.needsDaylight) return 0
+  return context.daylightMinutes >= 60 ? exactMatchPoints : -exactMatchPoints
+}
+
 export type ScoredActivity = {
   activity: Activity
   score: number
+  factors: Factors
 }
 
 // Highest score first. A tonight event beats a tied local activity, then
@@ -47,11 +82,12 @@ export type ScoredActivity = {
 export function recommend(
   activities: Activity[],
   checkIn: CheckIn,
+  context?: TonightContext | null,
 ): ScoredActivity[] {
   return activities
     .map((activity) => ({
       activity,
-      score: scoreActivity(activity, checkIn),
+      ...scoreActivity(activity, checkIn, context),
     }))
     .sort(
       (a, b) =>

@@ -3,6 +3,7 @@ import './App.css'
 import { activities } from './activities.ts'
 import type { Energy, Mood } from './activity.ts'
 import type { CheckIn, CheckInCompany } from './check-in.ts'
+import { loadContext, type TonightContext } from './context.ts'
 import { explain } from './explain.ts'
 import { loadTonight, takesDrinkAddOn, type DrinkSpecial } from './events.ts'
 import { recommend, type ScoredActivity } from './score.ts'
@@ -21,6 +22,7 @@ function App() {
   const [company, setCompany] = useState<CheckInCompany | null>(null)
   const [picks, setPicks] = useState<ScoredActivity[] | null>(null)
   const [drinkSpecial, setDrinkSpecial] = useState<DrinkSpecial | null>(null)
+  const [context, setContext] = useState<TonightContext | null>(null)
   const [showBackups, setShowBackups] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -30,17 +32,14 @@ function App() {
     if (!energy || !mood || !company || loading) return
     const checkIn: CheckIn = { energy, mood, company }
     setLoading(true)
-    let tonightEvents = activities
-    let special: DrinkSpecial | null = null
-    try {
-      const tonight = await loadTonight()
-      tonightEvents = [...activities, ...tonight.events]
-      special = tonight.drinkSpecial
-    } catch {
-      tonightEvents = activities
-    }
-    setPicks(recommend(tonightEvents, checkIn))
-    setDrinkSpecial(special)
+    const [tonight, tonightContext] = await Promise.all([
+      loadTonight().catch(() => null),
+      loadContext().catch(() => null),
+    ])
+    const tonightEvents = tonight ? [...activities, ...tonight.events] : activities
+    setPicks(recommend(tonightEvents, checkIn, tonightContext))
+    setDrinkSpecial(tonight?.drinkSpecial ?? null)
+    setContext(tonightContext)
     setShowBackups(false)
     setLoading(false)
   }
@@ -48,6 +47,7 @@ function App() {
   function reset() {
     setPicks(null)
     setDrinkSpecial(null)
+    setContext(null)
     setShowBackups(false)
   }
 
@@ -69,7 +69,7 @@ function App() {
           <p className="kicker">Do this</p>
           <h2>{primary.activity.name}</h2>
           <p className="description">{primary.activity.description}</p>
-          <p className="why">{explain(checkIn)}</p>
+          <p className="why">{explain(checkIn, primary.factors, context)}</p>
           {showDrink && drinkSpecial ? (
             <p className="addon">
               While you're out: {drinkSpecial.title} at {drinkSpecial.venue}
