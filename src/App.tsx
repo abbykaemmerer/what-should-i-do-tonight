@@ -6,6 +6,7 @@ import type { CheckIn, CheckInCompany } from './check-in.ts'
 import { loadContext, type TonightContext } from './context.ts'
 import { explain } from './explain.ts'
 import { loadTonight, takesDrinkAddOn, type DrinkSpecial } from './events.ts'
+import { happyHourLine } from './happy-hours.ts'
 import { recommend, type ScoredActivity } from './score.ts'
 
 const energyOptions: Energy[] = ['low', 'medium', 'high']
@@ -68,7 +69,7 @@ function App() {
         <section className="result">
           <p className="kicker">Do this</p>
           <h2>{primary.activity.name}</h2>
-          <p className="description">{primary.activity.description}</p>
+          <p className="description">{descriptionFor(primary.activity)}</p>
           <p className="why">{explain(checkIn, primary.factors, context)}</p>
           {showDrink && drinkSpecial ? (
             <p className="addon">
@@ -83,7 +84,7 @@ function App() {
                 {backups.map((pick) => (
                   <li key={pick.activity.id}>
                     <h3>{pick.activity.name}</h3>
-                    <p>{pick.activity.description}</p>
+                    <p>{descriptionFor(pick.activity)}</p>
                   </li>
                 ))}
               </ul>
@@ -129,6 +130,11 @@ function App() {
       )}
     </main>
   )
+}
+
+function descriptionFor(activity: { id: number; description: string }): string {
+  const happyHour = happyHourLine(activity.id)
+  return happyHour ? `${activity.description} ${happyHour}` : activity.description
 }
 
 function ChoiceGroup<T extends string>({

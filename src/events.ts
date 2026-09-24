@@ -28,7 +28,7 @@ const standingVenues = [
 const drinkAddOnIds = new Set([7, 10, 13])
 
 const drinkPattern =
-  /\b(drink|beer|cocktail|happy hour|jello|lone star|wine|margarita|shots?)\b/i
+  /\b(drink|beer|cocktail|jello|lone star|wine|margarita|shots?)\b/i
 
 const promoPattern = /\b(bogo|use code|%\s*off)\b/i
 
