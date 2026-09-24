@@ -25,8 +25,6 @@ const standingVenues = [
   'barbarella',
 ]
 
-const drinkAddOnIds = new Set([7, 10, 13])
-
 const drinkPattern =
   /\b(drink|beer|cocktail|jello|lone star|wine|margarita|shots?)\b/i
 
@@ -48,19 +46,8 @@ type Do512Response = {
   events: Do512Event[]
 }
 
-export type DrinkSpecial = {
-  title: string
-  venue: string
-  detail: string
-}
-
 export type Tonight = {
   events: Activity[]
-  drinkSpecial: DrinkSpecial | null
-}
-
-export function takesDrinkAddOn(activityId: number): boolean {
-  return drinkAddOnIds.has(activityId)
 }
 
 export async function loadTonight(): Promise<Tonight> {
@@ -72,12 +59,10 @@ export async function loadTonight(): Promise<Tonight> {
 
 export function tonightFromDo512(events: Do512Event[]): Tonight {
   const tonight = events.filter((event) => isTonight(event) && !event.sold_out)
-  const specials = tonight.filter(isDrinkSpecial)
   const plans = tonight.filter((event) => !isDrinkSpecial(event) && !isPromo(event))
 
   return {
     events: plans.flatMap(toActivity),
-    drinkSpecial: specials[0] ? toDrinkSpecial(specials[0]) : null,
   }
 }
 
@@ -139,14 +124,6 @@ function isDrinkSpecial(event: Do512Event): boolean {
 
 function isPromo(event: Do512Event): boolean {
   return promoPattern.test(`${event.title} ${event.ticket_info}`)
-}
-
-function toDrinkSpecial(event: Do512Event): DrinkSpecial {
-  return {
-    title: event.title,
-    venue: event.venue?.title ?? 'Austin',
-    detail: event.ticket_info,
-  }
 }
 
 function isTonight(event: Do512Event): boolean {
