@@ -48,6 +48,9 @@ export function explain(
   if (factors.energy > 0) aboutYou.push(`you have ${energyLabel[checkIn.energy]}`)
   if (factors.mood > 0) aboutYou.push(`you feel ${checkIn.mood}`)
   if (factors.company > 0) aboutYou.push(companyLabel[checkIn.company])
+  if (factors.setting > 0) {
+    aboutYou.push(checkIn.setting === 'outdoor' ? 'you want to be outside' : 'you want to be inside')
+  }
   if (aboutYou.length > 0) parts.push(joinList(aboutYou))
 
   if (parts.length === 0) return 'This is the closest match for tonight.'

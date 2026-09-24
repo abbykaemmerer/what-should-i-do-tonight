@@ -83,7 +83,7 @@ function toActivity(event: Do512Event): Activity[] {
       name: event.title,
       description: `${venue} at ${when}.`,
       energy: kind.energy,
-      moods: kind.energy === 'low' ? ['social'] : ['social', 'adventurous'],
+      moods: kind.energy === 'low' ? ['social', 'restless'] : ['social', 'adventurous', 'restless'],
       company: 'any',
       setting: 'either',
       movement: kind.movement,

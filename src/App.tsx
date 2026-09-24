@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import { activities } from './activities.ts'
 import type { Energy, Mood } from './activity.ts'
-import type { CheckIn, CheckInCompany } from './check-in.ts'
+import type { CheckIn, CheckInCompany, CheckInSetting } from './check-in.ts'
 import { loadContext, type TonightContext } from './context.ts'
 import { explain } from './explain.ts'
 import { loadTonight } from './events.ts'
@@ -11,17 +11,22 @@ import { moonNote } from './moon.ts'
 import { recommend, type ScoredActivity } from './score.ts'
 
 const energyOptions: Energy[] = ['low', 'medium', 'high']
-const moodOptions: Mood[] = ['chill', 'social', 'playful', 'adventurous', 'cozy']
+const moodOptions: Mood[] = ['chill', 'social', 'playful', 'adventurous', 'cozy', 'restless']
 const companyOptions: { value: CheckInCompany; label: string }[] = [
   { value: 'solo', label: 'Solo' },
   { value: 'date', label: 'With Eric' },
   { value: 'friends', label: 'Friends' },
+]
+const settingOptions: { value: CheckInSetting; label: string }[] = [
+  { value: 'indoor', label: 'Inside' },
+  { value: 'outdoor', label: 'Outside' },
 ]
 
 function App() {
   const [energy, setEnergy] = useState<Energy | null>(null)
   const [mood, setMood] = useState<Mood | null>(null)
   const [company, setCompany] = useState<CheckInCompany | null>(null)
+  const [setting, setSetting] = useState<CheckInSetting | null>(null)
   const [picks, setPicks] = useState<ScoredActivity[] | null>(null)
   const [context, setContext] = useState<TonightContext | null>(null)
   const [showBackups, setShowBackups] = useState(false)
@@ -29,11 +34,11 @@ function App() {
   const [eventsMissing, setEventsMissing] = useState(false)
   const [weatherMissing, setWeatherMissing] = useState(false)
 
-  const ready = energy !== null && mood !== null && company !== null
+  const ready = energy !== null && mood !== null && company !== null && setting !== null
 
   async function submit() {
-    if (!energy || !mood || !company || loading) return
-    const checkIn: CheckIn = { energy, mood, company }
+    if (!energy || !mood || !company || !setting || loading) return
+    const checkIn: CheckIn = { energy, mood, company, setting }
     setLoading(true)
     const [tonight, tonightContext] = await Promise.all([
       loadTonight().catch(() => null),
@@ -57,7 +62,7 @@ function App() {
   }
 
   const checkIn: CheckIn | null =
-    energy && mood && company ? { energy, mood, company } : null
+    energy && mood && company && setting ? { energy, mood, company, setting } : null
   const primary = picks?.[0]
   const backups = picks?.slice(1, 3) ?? []
   const moon = primary ? moonNote(primary.activity.setting) : null
@@ -120,6 +125,21 @@ function App() {
                   type="button"
                   aria-pressed={company === option.value}
                   onClick={() => setCompany(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="choices">
+            <legend>Inside or outside</legend>
+            <div className="options">
+              {settingOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={setting === option.value}
+                  onClick={() => setSetting(option.value)}
                 >
                   {option.label}
                 </button>

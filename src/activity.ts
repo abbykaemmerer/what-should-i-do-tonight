@@ -1,6 +1,6 @@
 export type Energy = 'low' | 'medium' | 'high'
 
-export type Mood = 'chill' | 'social' | 'playful' | 'adventurous' | 'cozy'
+export type Mood = 'chill' | 'social' | 'playful' | 'adventurous' | 'cozy' | 'restless'
 
 export type Company = 'solo' | 'date' | 'friends' | 'any'
 

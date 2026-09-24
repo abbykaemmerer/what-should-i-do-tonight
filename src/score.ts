@@ -13,6 +13,7 @@ export type Factors = {
   energy: number
   mood: number
   company: number
+  setting: number
   weather: number
   daylight: number
 }
@@ -22,18 +23,30 @@ export function scoreActivity(
   checkIn: CheckIn,
   context?: TonightContext | null,
 ): { score: number; factors: Factors } {
+  // A low-energy restless night means you need to move. Heat and sunset
+  // stop deciding, and a walk or class beats sitting still.
+  const moveAnyway = checkIn.mood === 'restless' && checkIn.energy === 'low'
   const factors = {
     energy: energyPoints(activity.energy, checkIn.energy),
     mood: moodPoints(activity, checkIn),
     company: companyPoints(activity, checkIn),
-    weather: context ? weatherPoints(activity, context) : 0,
-    daylight: context ? daylightPoints(activity, context) : 0,
+    setting: settingPoints(activity, checkIn),
+    // Inside or outside is a manual bypass: the sky no longer decides.
+    weather: 0,
+    daylight: context && !moveAnyway ? daylightPoints(activity, context) : 0,
   }
+  const score =
+    factors.energy +
+    factors.mood +
+    factors.company +
+    factors.setting +
+    factors.weather +
+    factors.daylight +
+    (moveAnyway && activity.movement !== 'still' && energyPoints(activity.energy, checkIn.energy) >= 0
+      ? exactMatchPoints
+      : 0)
 
-  return {
-    score: factors.energy + factors.mood + factors.company + factors.weather + factors.daylight,
-    factors,
-  }
+  return { score, factors }
 }
 
 function energyPoints(activityEnergy: Energy, checkInEnergy: Energy): number {
@@ -43,7 +56,12 @@ function energyPoints(activityEnergy: Energy, checkInEnergy: Energy): number {
 
   if (distance === 0) return exactMatchPoints
   if (distance === 1) return nearEnergyPoints
-  return 0
+  return -exactMatchPoints
+}
+
+function settingPoints(activity: Activity, checkIn: CheckIn): number {
+  if (activity.setting === 'either' || activity.setting === checkIn.setting) return exactMatchPoints
+  return -exactMatchPoints
 }
 
 function moodPoints(activity: Activity, checkIn: CheckIn): number {
@@ -55,15 +73,6 @@ function companyPoints(activity: Activity, checkIn: CheckIn): number {
     activity.company === 'any' || activity.company === checkIn.company
 
   return matches ? exactMatchPoints : 0
-}
-
-function weatherPoints(activity: Activity, context: TonightContext): number {
-  return context.conditions.reduce((total, condition) => {
-    if (activity.weather.includes(condition)) return total + exactMatchPoints
-    const harsh = condition === 'rain' || condition === 'hot' || condition === 'cold'
-    if (harsh && activity.setting === 'outdoor') return total - exactMatchPoints
-    return total
-  }, 0)
 }
 
 function daylightPoints(activity: Activity, context: TonightContext): number {
